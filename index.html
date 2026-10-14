@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2E6A44">
+<meta name="description" content="Sales training for new SmokED Stuff booth employees.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SmokED Academy">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>SmokED Stuff Sales Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a golf scorecard across the top (one cell per lesson = "hole"), one hole shown at a time below in a single reading column. */
+:root{
+  --paper:#F2F4EF; --card:#FFFFFF; --ink:#2A231E; --muted:#66655C; --line:#D6DACF;
+  --fairway:#2E6A44; --fairway-soft:#E1EDE3; --flag:#C9951F; --flag-soft:#F7ECCF;
+  --bad:#A4402C; --bad-soft:#F6E2DC;
+  --display:"Zilla Slab",Georgia,serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#161915; --card:#1F231E; --ink:#ECEBE3; --muted:#A2A598; --line:#353B33;
+  --fairway:#72BC8C; --fairway-soft:#22352A; --flag:#E2B44A; --flag-soft:#3A3120;
+  --bad:#E68168; --bad-soft:#3D2620; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#161915; --card:#1F231E; --ink:#ECEBE3; --muted:#A2A598; --line:#353B33;
+  --fairway:#72BC8C; --fairway-soft:#22352A; --flag:#E2B44A; --flag-soft:#3A3120;
+  --bad:#E68168; --bad-soft:#3D2620; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:24px 64px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,5vw,40px)}
+h2{font-size:clamp(24px,4vw,32px)}
+h3{font-size:21px}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header.top{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+header.top p{color:var(--muted);max-width:60ch}
+
+/* scorecard */
+.scorecard{overflow-x:auto;border:2px solid var(--ink);border-radius:4px;background:var(--card);margin-bottom:28px}
+.scorecard table{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.scorecard th,.scorecard td{border:1px solid var(--line);padding:6px 4px;text-align:center}
+.scorecard th:first-child,.scorecard td:first-child{text-align:left;padding-left:10px;width:88px;color:var(--muted);font-weight:500}
+.scorecard button{all:unset;cursor:pointer;display:block;width:100%;padding:2px 0;border-radius:3px}
+.scorecard button:focus-visible{outline:2px solid var(--fairway);outline-offset:1px}
+.scorecard .cur{background:var(--fairway-soft)}
+.scorecard .cur button{font-weight:700;color:var(--fairway)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);vertical-align:middle}
+.dot.on{background:var(--fairway);border-color:var(--fairway)}
+.tot{font-weight:700;color:var(--fairway)}
+
+/* hole */
+.hole{display:flex;flex-direction:column;gap:22px}
+.hole-head{display:flex;flex-direction:column;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.hole-head .goal{color:var(--muted)}
+.tee{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.tee-hole,.tee-par{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;padding:6px 16px;min-width:84px}
+.tee-hole{background:var(--fairway);color:var(--card)}
+.tee-par{background:var(--card);color:var(--ink);border:2px solid var(--ink)}
+.tee span:not(.tee-of){font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.tee b{font-family:var(--display);font-size:44px;line-height:1}
+.tee-of{align-self:flex-end;font-family:var(--mono);font-size:13px;color:var(--muted)}
+section.block{display:flex;flex-direction:column;gap:12px}
+ul.plain{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.say{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fairway);border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.say .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fairway)}
+.say q{quotes:none;font-size:19px;font-weight:700}
+.say q::before{content:"\201C"}.say q::after{content:"\201D"}
+h3.part{font-size:26px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.fill{display:inline-block;font-family:var(--mono);font-size:.8em;font-weight:500;text-transform:uppercase;letter-spacing:.06em;border:2px dashed var(--fairway);color:var(--fairway);border-radius:4px;padding:0 8px;line-height:1.5}
+.fill::before{content:"\270E  "}
+.cert-wait{border:2px dashed var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.cert-done{display:flex;flex-direction:column;gap:12px}
+.cert{background:#FFFFFF;color:#2A231E;border:10px solid #2E6A44;border-radius:4px;padding:8px}
+.cert-in{border:2px solid #C9951F;padding:28px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.cert-brand{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#66655C}
+.cert-title{font-family:var(--display);font-weight:700;font-size:clamp(32px,7vw,52px);color:#2E6A44;line-height:1.1}
+.cert-small{font-size:15px;color:#66655C;max-width:46ch}
+.cert-name{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,42px);border-bottom:2px solid #C9951F;padding:0 24px 4px;overflow-wrap:anywhere}
+.cert-foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;width:100%;margin-top:14px}
+.cert-foot div{display:flex;flex-direction:column;gap:2px;border-top:1px solid #2A231E;padding-top:6px;min-width:0}
+.cert-foot b{font-size:15px;overflow-wrap:anywhere}
+.cert-foot span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#66655C}
+.why{border:1px dashed var(--muted);border-radius:4px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;background:var(--paper)}
+.why .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.why p{font-size:16px}
+.do{background:var(--flag-soft);border:1px solid var(--flag);border-left:5px solid var(--flag);border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.do .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.do .act{font-size:19px;font-weight:700;display:flex;gap:10px;align-items:baseline}
+.do .act::before{content:"\25B6";font-size:14px;color:var(--flag)}
+.rule{background:var(--flag-soft);border:1px solid var(--flag);border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.rule .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.rule strong{font-family:var(--display);font-size:22px}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.good,.avoid{border-radius:4px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.good{background:var(--fairway-soft)}
+.avoid{background:var(--bad-soft)}
+.good .lbl{color:var(--fairway)}.avoid .lbl{color:var(--bad)}
+.good .lbl,.avoid .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:s}
+.steps>li{display:grid;grid-template-columns:40px 1fr;gap:12px;counter-increment:s}
+.steps>li::before{content:counter(s);font-family:var(--display);font-size:22px;font-weight:700;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center}
+.steps>li{position:relative}
+.steps>li:not(:last-child)::after{content:"";position:absolute;left:19px;top:44px;bottom:-16px;width:2px;background:var(--ink);opacity:.35}
+.step-of{color:var(--fairway);font-weight:500}
+.steps>li>div{display:flex;flex-direction:column;gap:10px;min-width:0}
+
+/* products */
+.prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.prod{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.prod h3{font-size:20px}
+.prod .id{font-family:var(--mono);font-size:12px;color:var(--fairway);text-transform:uppercase;letter-spacing:.08em}
+.prod .tag{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--flag-soft);border:1px solid var(--flag);border-radius:20px;padding:0 8px;margin-right:4px}
+.prod small{color:var(--muted);font-size:14px}
+.prod .tp{font-style:italic;font-size:15px}
+.found{display:flex;flex-wrap:wrap;gap:8px}
+.found span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:15px}
+
+table.route{border-collapse:collapse;width:100%;min-width:480px;font-size:16px}
+.tablebox{overflow-x:auto}
+table.route th,table.route td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+table.route th{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+table.route td:first-child{font-weight:700;white-space:nowrap}
+.price{font-variant-numeric:tabular-nums}
+.price td:last-child{font-family:var(--mono);text-align:right}
+
+/* games and quiz */
+.panel{background:var(--card);border:2px solid var(--ink);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.panel h3{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.panel h3 .score{font-family:var(--mono);font-size:14px;color:var(--muted)}
+.clue{font-size:19px;font-weight:700}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.btn{font:inherit;font-weight:700;cursor:pointer;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:4px;padding:10px 14px;text-align:left}
+.btn:hover{background:var(--fairway-soft)}
+.btn:focus-visible{outline:3px solid var(--fairway);outline-offset:2px}
+.btn.primary{background:var(--fairway);border-color:var(--fairway);color:var(--card);text-align:center}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.right{background:var(--fairway-soft);border-color:var(--fairway)}
+.btn.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.btn:disabled{cursor:default}
+.btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.next-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.scorecard .locked button{opacity:.35;cursor:not-allowed}
+.q{display:flex;flex-direction:column;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.q:last-of-type{border-bottom:0}
+.q legend{font-weight:700;padding:0;margin-bottom:6px}
+.q fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.q label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:6px 8px;border-radius:4px}
+.q label:hover{background:var(--fairway-soft)}
+.q input{margin-top:5px;accent-color:var(--fairway)}
+.fb{font-size:15px;border-radius:4px;padding:6px 10px}
+.fb.ok{background:var(--fairway-soft);color:var(--fairway)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.result{font-family:var(--display);font-size:22px}
+.nb-list{margin:0;padding-left:26px;display:flex;flex-direction:column;gap:12px}
+.nb-row{display:grid;grid-template-columns:1fr minmax(170px,220px);gap:6px 12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.nb-row .clue{font-size:17px;min-width:0}
+.nb-row .fb{grid-column:1/-1}
+.nb-row select{font:inherit;font-weight:700;color:var(--ink);background:var(--paper);border:2px solid var(--ink);border-radius:4px;padding:8px 10px;width:100%}
+.nb-row select.right{border-color:var(--fairway);background:var(--fairway-soft)}
+.nb-row select.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.nb-btns{display:flex;gap:10px;flex-wrap:wrap}
+@media (max-width:560px){.nb-row{grid-template-columns:1fr}}
+#mulligan-btn,#reset-btn{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.2;text-align:center}
+.b-sub{font-size:12px;font-weight:400;color:var(--muted)}
+.reset-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.reset-confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-soft);border:1px solid var(--bad);border-radius:4px;padding:8px 12px}
+.btn.small{padding:6px 12px;font-size:15px}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:var(--card)}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:16px}
+
+/* certification */
+.lvl{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lvl.done{border:2px solid var(--fairway)}
+.lvl .chk{display:flex;gap:10px;align-items:flex-start}
+.lvl .chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--fairway)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+input[type=text],input[type=date]{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.badge{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;padding:2px 10px;border-radius:20px;align-self:flex-start}
+.badge.on{background:var(--fairway);color:var(--card)}
+.badge.off{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.note{font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.hole{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">New employee training</span>
+    <h1>SmokED Stuff Sales Academy</h1>
+    <p>Eight holes. Play them in order. Pass the quiz on each hole to mark your scorecard. Your trainer signs off on Hole 8.</p>
+  </header>
+
+  <div class="scorecard" aria-label="Your progress">
+    <table>
+      <thead><tr id="sc-holes"><th>Hole</th></tr></thead>
+      <tbody>
+        <tr id="sc-names"><td>Lesson</td></tr>
+        <tr id="sc-par"><td>Par</td></tr>
+        <tr id="sc-score"><td>Quiz</td></tr>
+        <tr id="sc-done"><td>Done</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <main id="main"></main>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const PRODUCTS = [
+  {name:"Bunker", id:"Signature all-purpose", ing:["Smoked garlic","Smoked sea salt","Smoked black pepper"], best:"Steak, burgers, eggs, salads, vegetables, chicken", tp:"This has the smoked garlic, salt, and pepper you just smelled. It's our most versatile seasoning."},
+  {name:"Birdie", id:"Memphis-style poultry", ing:["Paprika","Brown sugar","Molasses","Onion"], best:"Chicken, turkey, wings", tp:"Classic Memphis BBQ flavor."},
+  {name:"Driver", id:"Latin-inspired", ing:["Cumin","Cilantro","Chipotle"], tags:["Salt-free","Sugar-free"], best:"Chicken, seafood, vegetables, fajitas", tp:"Latin-inspired with no salt and no sugar."},
+  {name:"Tee Box", id:"Lemon pepper", ing:["Lemon oil","Smoked black pepper","Corn meal"], best:"Chicken, fish, shrimp, vegetables", tp:"The corn meal adds texture and crunch."},
+  {name:"Caddie", id:"Jalapeño lime", ing:["Jalapeño","Lime","Sea salt","Cumin"], best:"Chicken, shrimp, fish tacos, vegetables", tp:"Bright citrus with a mild kick."},
+  {name:"Par", id:"Kansas City BBQ", ing:["Brown sugar","Paprika","Garlic","Salt","Pepper"], best:"Ribs, pork butt, pulled pork, pork loin", tp:"Traditional Kansas City style pork rub."},
+  {name:"Honey Putter", id:"Sweet honey pork", ing:["Honey granules","Celery seed","Paprika","Garlic"], best:"Pork butt, pork tenderloin, ribs, chicken, salmon", tp:"If you like a sweeter pork profile, this is usually the one people fall in love with."},
+  {name:"Texas Wedge", id:"Texas steakhouse", ing:["Ancho chili powder","Coffee","Cocoa","Cayenne"], best:"Steak, brisket, burgers, beef ribs", tp:"The coffee and cocoa build incredible depth and crust."},
+  {name:"Pitching Wedge", id:"Southwest steak", ing:["Salt","Pepper","Garlic","Chili powder","Cumin","Chipotle"], best:"Steak, burgers, beef", tp:"A Southwest flavor with smoky chipotle notes."}
+];
+
+const Q = {
+  1:[
+    {q:"What is our real job at the booth?", a:"Help people cook better food", w:["Sell as many bottles as we can","Explain how our smoker works"], why:"Teach first. Sell second."},
+    {q:"Which of the following lists all the smoked spices we carry?", a:"Garlic, sea salt, black pepper, paprika, onion, brown sugar", w:["Cumin, cilantro, chipotle, lime, cocoa, coffee","Honey, lemon, celery seed, cayenne, molasses, corn meal"], why:"Smoke comes first. We have six smoked products, and our blends are built on them."},
+    {q:"Which line is OK to say?", a:"\"We have smoked salt, pepper, and garlic.\"", w:["\"We smoke everything ourselves.\"","\"We make this in our smoker.\""], why:"Talk about what the product is, not how it's made."},
+    {q:"Finish the clean label line: all-natural, gluten-free, non-GMO, and...", a:"Contains no MSG", w:["Certified organic","Low fat"], why:"Never add claims that are not on the label. We do not say organic or low fat."},
+    {q:"Why do we teach before we sell?", a:"A customer who learned something trusts the person who taught them", w:["Teaching makes the sale take longer","Customers expect a class"], why:"People don't like being sold to, but they love learning."},
+    {q:"What happens if a customer catches one claim that isn't true?", a:"They doubt everything else you say", w:["Nothing, if the rest is true","They ask for a discount"], why:"Trust takes a long time to build and one false claim to lose."},
+    {q:"In the golden rule, what comes last?", a:"The wallet. Price comes once they already want it", w:["The nose","The imagination"], why:"Nose first, imagination second, wallet third."}
+  ],
+  2:[
+    {q:"A customer looks like they aren't stopping. What do you say?", a:"\"Smells are free today!\"", w:["\"Wait, come back!\"","Nothing. Let them go"], why:"A little humor shows there is no pressure. A laugh often turns a walk-by into a stop."},
+    {q:"What do you hand the customer first?", a:"The smoked garlic", w:["Bunker","The price sheet"], why:"Garlic first. It gets the biggest \"wow.\""},
+    {q:"How do you dry brine a steak?", a:"Season it the night before and leave it uncovered in the fridge", w:["Soak it in salt water for an hour","Salt it after it comes off the grill"], why:"Uncovered in the fridge overnight. The salt soaks in and the surface dries."},
+    {q:"What does dry brining give the customer?", a:"Deeper flavor and a better crust", w:["A shorter cook time","A sweeter taste"], why:"Flavor goes in. The dry surface sears into a better crust."},
+    {q:"You just asked, \"What do you like to cook the most?\" Now what?", a:"Stop talking and listen", w:["List all nine blends","Tell them the prices"], why:"Their answer tells you which bottles to show."},
+    {q:"Why do you name uses right after the \"wow\"?", a:"To turn surprise into \"I could use this\"", w:["To fill the silence","To get to the price faster"], why:"Going from surprise to usefulness is how a sale happens."},
+    {q:"Why do we tell the story after the smells, not before?", a:"A story told after the experience gets believed", w:["It's shorter that way","Customers ask for the story first"], why:"Told before, it sounds like a pitch. After, it gives a name to what they just smelled."},
+    {q:"Why teach dry brining for free?", a:"Giving something first builds trust and makes people want to give back", w:["To make the talk longer","To show off what we know"], why:"You become the expert, not just the person selling."},
+    {q:"What is the right order?", a:"Garlic, salt, story, Bunker, ask", w:["Bunker, garlic, prices, ask","Ask, prices, Bunker, salt"], why:"The garlic and salt set up Bunker. Then you ask."}
+  ],
+  3:[
+    {q:"Which blend is salt-free and sugar-free?", a:"Driver", w:["Caddie","Par"], why:"Driver: cumin, cilantro, chipotle. No salt, no sugar."},
+    {q:"Which blend has coffee and cocoa?", a:"Texas Wedge", w:["Pitching Wedge","Bunker"], why:"Texas Wedge: ancho, coffee, cocoa, cayenne."},
+    {q:"Which blend uses corn meal for crunch?", a:"Tee Box", w:["Birdie","Honey Putter"], why:"Tee Box is our lemon pepper. The corn meal adds texture."},
+    {q:"Honey granules and celery seed are in...", a:"Honey Putter", w:["Par","Birdie"], why:"Honey Putter = sweet pork."},
+    {q:"Which blend is Memphis-style for poultry?", a:"Birdie", w:["Par","Caddie"], why:"Birdie: paprika, brown sugar, molasses, onion."},
+    {q:"Which blend is Kansas City BBQ?", a:"Par", w:["Texas Wedge","Honey Putter"], why:"Par is our traditional KC pork rub."},
+    {q:"A customer asks, \"What makes yours different?\" What do you point back to?", a:"The smoke", w:["The price","The bottle size"], why:"Our blends are built on six smoked products."},
+    {q:"Why practice until blend names come without thinking?", a:"Quick answers sound like an expert", w:["So you can talk faster than the customer","So you can skip the smell step"], why:"If you have to stop and think, you sound unsure."}
+  ],
+  4:[
+    {q:"\"I grill chicken every week.\" Which set do you show?", a:"Birdie, Driver, Tee Box, Caddie", w:["Texas Wedge, Pitching Wedge","Par, Honey Putter"], why:"Those four are the chicken lineup."},
+    {q:"\"We do steak on Fridays.\" Which set do you show?", a:"Bunker, Texas Wedge, Pitching Wedge", w:["Birdie, Caddie","Tee Box, Driver"], why:"Steak = Bunker plus the two Wedges."},
+    {q:"\"I smoke ribs.\" Which pair do you show?", a:"Par and Honey Putter", w:["Birdie and Tee Box","Caddie and Driver"], why:"Then ask: traditional KC or sweeter and honey-forward?"},
+    {q:"\"My doctor told me to cut back on salt.\" Lead with...", a:"Driver", w:["Bunker","Pitching Wedge"], why:"Driver is salt-free. Bunker and Pitching Wedge both have salt."},
+    {q:"When you present a blend, what comes first?", a:"Let them smell it", w:["Read the ingredients","Say the price"], why:"Smell, style, ingredients, uses. Never start with ingredients."},
+    {q:"Why does smell come before ingredients?", a:"Smell makes them feel something. A list of ingredients doesn't", w:["Ingredients take too long to read","Smell is the cheapest step"], why:"Feel, name, trust, picture. Start with smell and it is an experience."},
+    {q:"Why show only two to four bottles instead of all nine?", a:"Too many choices make people freeze", w:["We run out of samples","The others don't sell well"], why:"A few bottles that fit their cooking make the choice easy. It also shows you listened."},
+    {q:"Why ask \"Kansas City BBQ or something sweeter?\"", a:"It changes \"Should I buy?\" into \"Which one fits me?\"", w:["It makes the talk longer","It tests what they know about BBQ"], why:"Both answers lead to a bottle, and the customer owns the choice."},
+    {q:"A customer says \"I grill chicken.\" What is a good next question?", a:"\"Do you like a little heat, or keep it mild?\"", w:["\"Do you want to buy one?\"","\"How much do you want to spend?\""], why:"Every answer cuts the list down and shows you know cooking."},
+    {q:"A customer likes heat. Which blend has jalapeño?", a:"Caddie", w:["Birdie","Honey Putter"], why:"Caddie is jalapeño lime. Texas Wedge has cayenne. Pitching Wedge and Driver have chipotle."},
+    {q:"Which line sounds most like an expert?", a:"\"For ribs, I'd go with Par.\"", w:["\"We have a few you could try.\"","\"They're all pretty good.\""], why:"Recommend, don't list."},
+    {q:"You made one match. What do you ask next?", a:"\"What else do you like to cook?\"", w:["\"Is that everything?\"","\"Cash or card?\""], why:"A second match starts a three-pack, and it still feels like help."}
+  ],
+  5:[
+    {q:"How much is one large bottle?", a:"$15", w:["$11","$13"], why:"Large $15. Small $11."},
+    {q:"How much are three large bottles?", a:"$43", w:["$45","$40"], why:"Three large is $43. That saves $2."},
+    {q:"How much are three small bottles?", a:"$30", w:["$33","$27"], why:"Three small is $30. That saves $3."},
+    {q:"A customer has picked out five bottles. What do you tell them?", a:"\"Pick one more. The sixth one is free.\"", w:["Nothing, ring them up","\"You get 10% off.\""], why:"Buy 5, get 1 free. Always tell them."},
+    {q:"A customer gets a three-pack at the deal price, then picks out 2 more bottles. Do the three-pack bottles count toward Buy 5, Get 1 Free?", a:"No. Deals can't be combined", w:["Yes, that makes 5, so the sixth is free","Only if they are all large bottles"], why:"Three-pack bottles don't count toward Buy 5, Get 1 Free. Use one deal or the other."},
+    {q:"After the value line, what do you do?", a:"Hand them the bottle so they can read the label", w:["Read every ingredient out loud","Move on to the price"], why:"Let the label sell itself."},
+    {q:"Why say the value line before the price?", a:"When value comes first, the price sounds fair", w:["It's a rule from the market","Customers always ask for it"], why:"Price first just sounds like a cost."},
+    {q:"Why have the customer read the label themselves?", a:"People believe what they see for themselves", w:["It saves you time","So they can find the price"], why:"Reading the label turns your words into proof."},
+    {q:"When should you bring up the three-pack?", a:"When they're holding two bottles", w:["Before they smell anything","Only if they ask"], why:"Then a third bottle saves them money. It feels like a tip."},
+    {q:"Why tell them about the free sixth bottle?", a:"It shows you're on their side", w:["To clear out old stock","So the line moves faster"], why:"People remember who saved them money."}
+  ],
+  6:[
+    {q:"Which closing question should you use?", a:"\"Which ones were your favorites?\"", w:["\"Do you want one?\"","\"Are you going to buy anything?\""], why:"A yes/no question makes it easy to say no."},
+    {q:"\"I already have a cabinet full of seasonings.\" First you...", a:"Agree with them, then talk about our labels", w:["Tell them their seasonings are bad","Drop the price"], why:"\"I completely understand. Most of us do.\" Then the label line."},
+    {q:"Which line helps build a bigger sale?", a:"\"Let's build your three-pack.\"", w:["\"Just one today?\"","\"Let me know if you need anything.\""], why:"The three-pack is a better deal for them and a bigger sale for us."},
+    {q:"Why agree first when they say \"I already have a cabinet full\"?", a:"It lowers their guard. They expect a fight and get a friend", w:["So they feel bad about their cabinet","To end the talk quickly"], why:"Then give them one new reason: the label."},
+    {q:"\"I'll come back later.\" What do you say?", a:"\"Sounds good. Which one was your favorite, so I know what to grab for you?\"", w:["\"Okay, bye!\"","\"Prices go up tomorrow.\""], why:"Naming a favorite makes the choice real."},
+    {q:"A customer can't decide. Which bottle do you pick for them?", a:"The one they kept coming back to", w:["Always Bunker","The most expensive one"], why:"Watch which bottle they smelled twice or asked about. Pick that one."},
+    {q:"What is the last thing you tell them as they leave?", a:"How to use it tonight, like the dry brine", w:["The store hours","Nothing, just say bye"], why:"They cook it right, love it, and come back for more."}
+  ]
+};
+
+const HOLES = [
+  {n:1, par:3, short:"Story", title:"The SmokED Stuff Way"},
+  {n:2, par:4, short:"Opening", title:"The Opening Script"},
+  {n:3, par:4, short:"Lineup", title:"Know the Lineup"},
+  {n:4, par:5, short:"Matching", title:"Match the Cook"},
+  {n:5, par:3, short:"Price", title:"Value and Price"},
+  {n:6, par:4, short:"Close", title:"Objections and Closing"},
+  {n:7, par:5, short:"Practice", title:"Practice Round"},
+  {n:8, par:5, short:"Certify", title:"Certification"}
+];
+
+const CERT = [
+  {lvl:1, name:"Product Knowledge", items:["Names all 9 blends and the 6 smoked products by smell, eyes closed","Gives each blend's identity in one line (example: \"Par, Kansas City BBQ\")","Says the clean label line from memory","Has cooked with at least 3 blends at home and can say how they used each one"]},
+  {lvl:2, name:"Sales Process", items:["Runs garlic, salt, story, Bunker, discovery without notes","Explains dry brining in their own words","Says \"We have smoked...\" and never \"We smoke our own...\""]},
+  {lvl:3, name:"Product Matching", items:["Picks the right bottles for chicken, steak, pork, seafood, and health-conscious customers","Presents in order: smell, style, ingredients, uses","Asks the Par or Honey Putter question for pork and ribs customers"]},
+  {lvl:4, name:"Independent Seller", items:["Quotes every price and deal without looking","Handles the \"cabinet full of seasonings\" objection","Closes with a favorites question, never \"Do you want one?\"","Runs the booth alone for a full market day"]}
+];
+
+/* ---------- state ---------- */
+const KEY="ss-academy-v1";
+let S={cur:1,done:{},cert:{},scores:{},trainee:"",trainer:""};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const say=(t,lbl="Say this")=>`<div class="say"><span class="lbl">${lbl}</span><q>${t}</q></div>`;
+const why=(t,lbl="Why it works")=>`<div class="why"><span class="lbl">${lbl}</span><p>${t}</p></div>`;
+const doit=t=>`<div class="do"><span class="lbl">Do this</span><span class="act">${t}</span></div>`;
+
+/* ---------- scorecard ---------- */
+function renderCard(){
+  const h=$("#sc-holes"),n=$("#sc-names"),d=$("#sc-done"),sc=$("#sc-score"),pr=$("#sc-par");
+  S.scores=S.scores||{};
+  h.innerHTML="<th>Hole</th>";n.innerHTML="<td>Lesson</td>";d.innerHTML="<td>Done</td>";sc.innerHTML="<td>Quiz</td>";pr.innerHTML="<td>Par</td>";
+  HOLES.forEach(x=>{
+    const c=x.n===S.cur?' class="cur"':"";
+    const lk=unlocked(x.n)?"":" disabled";const cl=(x.n===S.cur?"cur":"")+(lk?" locked":"");const c2=cl?` class="${cl.trim()}"`:"";
+    h.insertAdjacentHTML("beforeend",`<th${c2}><button data-go="${x.n}"${lk} aria-label="Go to hole ${x.n}, ${x.title}">${x.n}</button></th>`);
+    n.insertAdjacentHTML("beforeend",`<td${c2}><button data-go="${x.n}" tabindex="-1"${lk}>${x.short}</button></td>`);
+    let v="–";
+    if(x.n===8){const l=CERT.filter(z=>z.items.every((_,i)=>(S.cert[z.lvl]||{})["i"+i])).length;v=l?`${l}/4 lvls`:"–";}
+    else if(S.scores[x.n])v=`${S.scores[x.n].r}/${S.scores[x.n].t}`;
+    sc.insertAdjacentHTML("beforeend",`<td${c}>${v}</td>`);
+    pr.insertAdjacentHTML("beforeend",`<td${c}>${x.par}</td>`);
+    d.insertAdjacentHTML("beforeend",`<td${c}><span class="dot${S.done[x.n]?" on":""}" title="${S.done[x.n]?"Passed":"Not yet"}"></span></td>`);
+  });
+  const total=HOLES.filter(x=>S.done[x.n]).length;
+  d.insertAdjacentHTML("beforeend","");
+  h.insertAdjacentHTML("beforeend",`<th>Total</th>`);
+  n.insertAdjacentHTML("beforeend",`<td></td>`);
+  sc.insertAdjacentHTML("beforeend",`<td></td>`);
+  pr.insertAdjacentHTML("beforeend",`<td class="tot">${HOLES.reduce((t,x)=>t+x.par,0)}</td>`);
+  d.insertAdjacentHTML("beforeend",`<td class="tot">${total}/8</td>`);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b){go(+b.dataset.go);}});
+function unlocked(n){for(let k=1;k<n&&k<8;k++){if(!S.done[k])return false;}return true;}
+function go(n){if(!unlocked(n))return;S.cur=n;save();renderCard();renderHole();window.scrollTo({top:0,behavior:"smooth"});}
+
+/* ---------- quiz ---------- */
+function quiz(holeN,list,{pass,label="Hole quiz"}={}){
+  const id="qz"+holeN;
+  const items=list.map((it,i)=>({...it,opts:shuffle([it.a,...it.w]),i}));
+  pass=pass??items.length;
+  const html=`<div class="panel" id="${id}"><h3>${label}<span class="score">Pass: ${pass} of ${items.length}</span></h3>
+  ${items.map(it=>`<div class="q"><fieldset><legend>${it.i+1}. ${esc(it.q)}</legend>
+    ${it.opts.map((o,k)=>`<label><input type="radio" name="${id}-${it.i}" id="${id}-${it.i}-${k}" value="${esc(o)}"> <span>${esc(o)}</span></label>`).join("")}
+  </fieldset><div class="fb" hidden></div></div>`).join("")}
+  <button class="btn primary" type="button">Check my answers</button><p class="result" hidden></p></div>`;
+  setTimeout(()=>{
+    const root=document.getElementById(id);if(!root)return;
+    root.querySelector(".btn.primary").addEventListener("click",()=>{
+      let right=0;
+      items.forEach(it=>{
+        const box=root.querySelectorAll(".q")[it.i];
+        const pick=box.querySelector("input:checked");
+        const fb=box.querySelector(".fb");fb.hidden=false;
+        if(pick&&pick.value===it.a){right++;fb.className="fb ok";fb.textContent="Correct. "+it.why;}
+        else{fb.className="fb no";fb.textContent=(pick?"Not quite. ":"Pick an answer. ")+it.why;}
+      });
+      S.scores=S.scores||{};const prev=S.scores[holeN];
+      if(!prev||right>prev.r)S.scores[holeN]={r:right,t:items.length};save();renderCard();
+      const r=root.querySelector(".result");r.hidden=false;
+      if(right>=pass){r.textContent=`${right} of ${items.length}. In the hole! Your scorecard is marked.`;S.done[holeN]=true;save();renderCard();}
+      else r.textContent=`${right} of ${items.length}. Read the notes above and try again.`;
+      const nb=document.getElementById("next-btn");if(nb&&unlocked(+nb.dataset.go)){nb.disabled=false;const hn=document.getElementById("next-hint");if(hn)hn.hidden=true;}
+    });
+  });
+  return html;
+}
+
+/* ---------- name that blend game ---------- */
+function blendGame(){
+  setTimeout(()=>{
+    const root=$("#game");if(!root)return;
+    const list=root.querySelector(".nb-list"),res=root.querySelector(".result");
+    let order=[];
+    function deal(){
+      order=shuffle(PRODUCTS);res.hidden=true;root.querySelector(".score").textContent="9 blends";
+      const opts=`<option value="">Pick a blend</option>`+PRODUCTS.map(p=>`<option>${p.name}</option>`).join("");
+      list.innerHTML=order.map((p,i)=>`<li class="nb-row"><label for="nb-${i}" class="clue">${p.ing.join(" · ")}</label>
+        <select id="nb-${i}">${opts}</select><div class="fb" hidden></div></li>`).join("");
+    }
+    root.querySelector(".check").addEventListener("click",()=>{
+      let right=0;
+      order.forEach((p,i)=>{
+        const sel=document.getElementById("nb-"+i),fb=sel.parentElement.querySelector(".fb");
+        fb.hidden=false;const ok=sel.value===p.name;if(ok)right++;
+        sel.classList.toggle("right",ok);sel.classList.toggle("wrong",!ok);
+        fb.className="fb "+(ok?"ok":"no");
+        fb.textContent=ok?`Yes. ${p.name} is our ${p.id.toLowerCase()} blend.`:`This is ${p.name}, our ${p.id.toLowerCase()} blend.`;
+      });
+      root.querySelector(".score").textContent=`${right} of 9`;
+      res.hidden=false;res.textContent=right===9?"9 of 9. You know the lineup!":`${right} of 9. Shuffle and go again until you get all 9.`;
+    });
+    root.querySelector(".again").addEventListener("click",deal);
+    deal();
+  });
+  return `<div class="panel" id="game"><h3>Name that blend<span class="score">9 blends</span></h3>
+  <p class="note">All nine blends, in a random order. Read each ingredient list and pick the blend. Then check your answers.</p>
+  ${why('A conversation moves fast. If you have to stop and think, you sound unsure. Practice until the names come without effort. Quick answers sound like an expert.')}
+  <ol class="nb-list"></ol>
+  <div class="nb-btns"><button class="btn primary check" type="button">Check my answers</button><button class="btn again" type="button">Shuffle and try again</button></div>
+  <p class="result" hidden></p></div>`;
+}
+
+/* ---------- holes ---------- */
+const BODY = {
+1:()=>`
+<section class="block"><h3>Our mission</h3>
+<p>We are not selling seasoning. We help people cook better food.</p>
+<p>Every customer should leave the booth knowing something new. Teach first. Sell second.</p>
+${why('People don\'t like being sold to, but they love learning. When you teach, they relax and listen. A customer who learned something trusts the person who taught them.')}</section>
+
+<section class="block"><h3>Smoke comes first</h3>
+<p>Most seasoning companies start with a recipe. We start with smoked ingredients. These six smoked products are the base of our blends:</p>
+<div class="found"><span>Smoked Garlic</span><span>Bourbon Barrel Smoked Sea Salt</span><span>Smoked Black Pepper</span><span>Smoked Paprika</span><span>Smoked Onion</span><span>Smoked Brown Sugar</span></div>
+${why('Every brand needs one thing that sets it apart. For us, it\'s smoke. When you can say in one sentence what makes us special, customers remember us.')}</section>
+
+<section class="block"><h3>Clean labels</h3>
+<p>Learn this line word for word. You will use it all day.</p>
+${say("Everything we make is all-natural, gluten-free, non-GMO, contains no MSG, and uses ingredients you can actually recognize.","Memorize this")}
+${why('Many shoppers read labels now. A short list of real ingredients answers their worries before they ask. Saying the line the same way every time makes you sound sure.')}</section>
+
+<section class="block"><h3>Say what it is, not how it's made</h3>
+<p>Keep every claim true. Talk about the product, not the kitchen.</p>
+<div class="twocol">
+<div class="good"><span class="lbl">Say</span><span>"We have smoked salt, pepper, and garlic."</span><span>"This is California garlic smoked over hickory."</span><span>"This sea salt is bourbon barrel smoked."</span></div>
+<div class="avoid"><span class="lbl">Don't say</span><span>"We smoke everything ourselves."</span><span>"We smoke this in our smoker."</span><span>"We make all of our smoked spices."</span></div>
+</div>
+${why('Trust takes a long time to build and one false claim to lose. If a customer catches one thing that isn\'t true, they doubt everything else you say.')}</section>
+
+<div class="rule"><span class="lbl">The golden rule</span><strong>Customers buy with their nose first, their imagination second, and their wallet third.</strong></div>
+${why('This is the order of the whole sale. Smell starts it. Picturing the meal grows it. Price comes last, once they already want it.')}
+${quiz(1,Q[1])}`,
+
+2:()=>`
+<div class="rule"><span class="lbl">Your sales script</span><strong>Use this with every customer who walks up to the booth.</strong>
+<span>Follow the 5 steps in order, from Step 1 to Step 5. Learn it until you can do it without notes. Every step puts a bottle in the customer's hand.</span></div>
+${why('Each step makes the next one easier. The customer goes from curious, to interested, to trusting you, to wanting a bottle, to telling you what they need. They walk up as a stranger. They become a student. Then they become a buyer.','Why this order')}
+<ol class="steps">
+<li><div><span class="eyebrow step-of">Step 1 of 5</span><h3>The hook: smoked garlic</h3>
+${say("We have smoked salt, pepper, and garlic. Have you ever smelled smoked garlic?")}
+${say("Smells are free today!","If they look like they aren't stopping")}
+${why('A little humor lowers people\'s guard. "Smells are free" tells them stopping costs nothing and there is no pressure. A laugh often turns a walk-by into a stop.')}
+${doit("Hand them the smoked garlic.")}
+${why('A question invites people in. "Have you ever smelled smoked garlic?" is easy to answer and costs them nothing. Putting a bottle in their hand turns a walk-by into a moment. Smell works fast. It reaches them before they start thinking about price. The details, California garlic and 8 hours over hickory, tell them you know your product.','Why it works')}
+${say("This is California granulated garlic powder smoked over hickory wood for 8 hours. Go ahead and give that a smell.")}
+${say("Most people use it on steaks, burgers, chicken, vegetables, eggs, potatoes, and even popcorn.","After the wow")}
+${why('Surprise gets attention, but attention fades fast. Naming uses right away turns "Wow" into "I could use this." Going from surprise to usefulness is how a sale happens.','Why it works')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 2 of 5</span><h3>Smoked salt and dry brining</h3>
+${say("Now compare that to our Bourbon Barrel Smoked Sea Salt.")}
+${doit("Hand them the salt. Let them smell it.")}
+${say("One of my favorite ways to use this is dry brining. Season a steak or whole chicken the night before and leave it uncovered in the fridge. The salt soaks into the meat and dries the surface. You get deeper flavor and a better crust.","Teach this")}
+${why('A second smell gives them something to compare. Now they are judging, not just reacting. The dry brining tip is a gift they can use tonight. When you give something first, people want to give back. You also become the expert, not just the person selling.','Why it works')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 3 of 5</span><h3>The story</h3>
+${say("The reason I wanted you to smell those first is that those smoked ingredients are the base of everything we make. That's where the name SmokED Stuff comes from.")}
+${doit("Pick up Bunker while you say it.")}
+${why('A story told after the experience gets believed. Told before, it sounds like a pitch. They have already smelled what makes us different. The story just gives it a name.','Why it works')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 4 of 5</span><h3>Bunker</h3>
+${say("This is Bunker. It has the smoked garlic, smoked salt, and smoked pepper you just smelled. It's our most versatile seasoning.")}
+${doit("Let them smell it. Mention steak, burgers, eggs, salads, vegetables, and chicken.")}
+${why('Bunker is made from the three things they just liked. It doesn\'t feel like something new to judge. It feels like something they already know. It is our most versatile blend, so it fits almost any kitchen. It gives them an easy first yes.','Why it works')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 5 of 5</span><h3>The question</h3>
+${say("What do you like to cook the most?")}
+${doit("Then stop talking. Listen. Their answer tells you what to show next (Hole 4).")}
+${why('By now they have smelled three things and learned something. They are relaxed and ready to talk. Asking what they cook makes the conversation about them. People trust advice that fits their life. Then stay quiet. The quiet gives them room to tell you what they need.','Why it works')}</div></li>
+</ol>
+<p class="note"><strong>End of script.</strong> Their answer to Step 5 tells you which bottles to show. You'll learn that in Hole 4.</p>
+${quiz(2,Q[2])}`,
+
+3:()=>`
+<section class="block"><h3>The six smoked products</h3>
+<div class="found"><span>Smoked Garlic</span><span>Bourbon Barrel Smoked Sea Salt</span><span>Smoked Black Pepper</span><span>Smoked Paprika</span><span>Smoked Onion</span><span>Smoked Brown Sugar</span></div>
+${why('Knowing the base helps you explain every blend. When a customer asks "What makes this different?" you can point back to the smoke.')}</section>
+<section class="block"><h3>The nine blends</h3>
+<p class="note">Every blend is named after golf. Each one has one clear job.</p>
+<div class="prods">${PRODUCTS.map(p=>`<div class="prod"><span class="id">${p.id}</span><h3>${p.name}</h3>
+<div>${(p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+<span>${p.ing.join(", ")}</span><small>Best for: ${p.best}</small><span class="tp">"${p.tp}"</span></div>`).join("")}</div>
+${why('Each blend has one clear job, so you can match it fast. When you can say in one line what a blend is for, customers trust your advice.')}</section>
+${blendGame()}
+${quiz(3,Q[3])}`,
+
+4:()=>`
+<section class="block"><h3>Listen for clues</h3>
+<p>Their answer to "What do you like to cook the most?" is only the start. Ask one or two more questions to narrow it down.</p>
+${say("How do you usually cook it? Grill, smoker, or oven?","Ask one of these")}
+${say("Do you like a little heat, or keep it mild?","Or")}
+${say("Who are you cooking for?","Or")}
+${why('Every answer cuts the list down. When you ask good questions, you sound like someone who knows cooking, not someone reading a price tag.')}</section>
+
+<section class="block"><h3>Who gets what</h3>
+<div class="tablebox"><table class="route">
+<thead><tr><th>Customer says</th><th>Show these</th></tr></thead><tbody>
+<tr><td>"I cook chicken"</td><td>Birdie, Driver, Tee Box, Caddie</td></tr>
+<tr><td>"I cook steak"</td><td>Bunker, Texas Wedge, Pitching Wedge</td></tr>
+<tr><td>"I cook pork / ribs"</td><td>Par, Honey Putter (Bunker as a backup)</td></tr>
+<tr><td>"I cook seafood"</td><td>Tee Box, Caddie, Driver (Honey Putter for salmon)</td></tr>
+<tr><td>"I like heat"</td><td>Caddie (jalapeño), Texas Wedge (cayenne), Pitching Wedge and Driver (chipotle)</td></tr>
+<tr><td>"A little of everything" or "I don't cook much"</td><td>Bunker</td></tr>
+<tr><td>Watching salt, sugar, or MSG</td><td>Driver first, then the clean label line</td></tr>
+</tbody></table></div>
+${why('Too many choices make people freeze. Show them everything and they often buy nothing. Two to four bottles that fit their cooking make the choice easy. It also shows them you listened.')}</section>
+
+<section class="block"><h3>Show bottles in this order</h3>
+<div class="rule"><span class="lbl">Every blend, every time</span><strong>Smell → Style → Ingredients → Uses</strong>
+<span>Never start with ingredients. Nose first.</span></div>
+${why('Smell makes them feel something. Style gives that feeling a name, like "Kansas City BBQ." Ingredients prove it is real and clean. Uses help them picture it on their plate tonight. Feel, name, trust, picture. Start with ingredients and it is just a list. Start with smell and it is an experience.')}</section>
+
+<section class="block"><h3>A full example</h3>
+<p>Here is how the four steps sound out loud. A chicken customer, with Birdie.</p>
+${doit("Smell: Hand them Birdie.")}
+${say("Give that a smell.")}
+${say("This is Birdie. It's a Memphis-style poultry rub.","Style")}
+${say("Paprika, brown sugar, molasses, and onion.","Ingredients")}
+${say("It's great on chicken, turkey, and wings.","Uses")}</section>
+
+<section class="block"><h3>Show two side by side</h3>
+${doit("Hand them two bottles that are very different. For chicken, try Birdie (sweet BBQ) next to Caddie (bright citrus).")}
+<p>The difference helps them find what they like.</p>
+${why('People judge better by comparing than by trying one thing alone. It is the same reason the pork question works.')}</section>
+
+<section class="block"><h3>The pork question</h3>
+<p>Let the customer choose. Don't choose for them.</p>
+${say("Do you like a traditional Kansas City BBQ flavor, or something a little sweeter and honey-forward?")}
+${doit("KC answer: Par. Sweeter answer: Honey Putter.")}
+${why('Two good options change the question. It is no longer "Should I buy?" It becomes "Which one fits me?" Both answers lead to a bottle. The customer picks, so the choice feels like theirs.')}</section>
+
+<section class="block"><h3>The health question</h3>
+${say("Are there any ingredients you're trying to avoid?")}
+${doit("Point out that Driver is salt-free and sugar-free. Then hand them a bottle and let them read the label.")}
+${why('This question shows you care about them, not just the sale. It also tells you which bottles to skip, so you never hand them the wrong one. Then let the label talk. People trust what they read more than what they hear.')}</section>
+
+<section class="block"><h3>The next question</h3>
+<p>Once you've made one match, keep going.</p>
+${say("What else do you like to cook?")}
+${why('One match makes one sale. A second match starts a three-pack. You are still helping them, so it does not feel like a push.')}</section>
+
+<section class="block"><h3>Talk like a cook</h3>
+<p>People buy from someone they see as an expert. These habits make you one.</p>
+<div class="twocol">
+<div class="good"><span class="lbl">Say</span><span>"For ribs, I'd go with Par."</span><span>"Here's how I use it."</span><span>"Smoked 8 hours over hickory."</span></div>
+<div class="avoid"><span class="lbl">Don't say</span><span>"We have a few you could try."</span><span>"You could try it on stuff."</span><span>"It's smoked for a while."</span></div>
+</div>
+<ul class="plain">
+<li><strong>Use details.</strong> Details sound like experience.</li>
+<li><strong>Recommend, don't list.</strong> Pick one for them and say why.</li>
+<li><strong>Share what you do.</strong> Cook with our blends at home so you have real stories to tell.</li>
+<li><strong>Be honest.</strong> If a blend isn't right for them, say so. Honesty makes people trust the rest of what you say.</li>
+</ul>
+${why('Authority only works when it is real. Cook with the blends, learn the details, and your advice will sound like a cook talking, because it is.','Why it works')}</section>
+${quiz(4,Q[4])}`,
+
+5:()=>`
+<section class="block"><h3>The value line</h3>
+${say("Everything we make is all-natural, gluten-free, non-GMO, contains no MSG, and uses ingredients you can actually recognize.")}
+${why('Say what they get before what it costs. When the price comes after the value, it sounds fair. When it comes first, it just sounds like a cost.')}
+${doit("Hand them the bottle.")}
+${say("Take a look at the ingredient panel.")}
+${why('People believe what they see for themselves. Reading the label turns your words into proof.')}</section>
+
+<section class="block"><h3>Prices</h3>
+<div class="tablebox"><table class="route price"><thead><tr><th>Item</th><th>Price</th></tr></thead><tbody>
+<tr><td>Large bottle</td><td>$15</td></tr>
+<tr><td>3 large bottles</td><td>$43</td></tr>
+<tr><td>Small bottle</td><td>$11</td></tr>
+<tr><td>3 small bottles</td><td>$30</td></tr>
+<tr><td>Buy 5</td><td>Get 1 free</td></tr>
+</tbody></table></div>
+<div class="rule"><span class="lbl">Deals can't be combined</span><strong>Three-pack bottles don't count toward Buy 5, Get 1 Free.</strong><span>Use one deal or the other on a sale.</span></div>
+${why('One clear rule keeps checkout simple. Simple deals feel fair, and nobody feels tricked.')}</section>
+
+<section class="block"><h3>When to bring up a deal</h3>
+${doit("When someone holds two bottles, mention the three-pack.")}
+${why('Bring up the deal only when it helps them. When they are holding two bottles, a third saves them money. That feels like a tip, not a pitch.')}
+${doit("When someone holds five, switch to Buy 5, Get 1 Free and tell them to pick a sixth.")}
+${why('Telling them about the free bottle shows you are on their side. People remember who saved them money.')}</section>
+${quiz(5,Q[5])}`,
+
+6:()=>`
+<h3 class="part">Objections</h3>
+<p class="note">These are not steps in order. Use the one that matches what the customer says.</p>
+<ol class="steps">
+<li><div><span class="eyebrow step-of">Objection 1 of 4</span><h3>"I already have a cabinet full of seasonings."</h3>
+${say("I completely understand. Most of us do.")}
+${say("One thing people like about ours is the label. Everything is all-natural, gluten-free, non-GMO, has no MSG, and uses ingredients you can actually recognize.","Then")}
+${doit("Hand them the bottle. Let them read it. Say nothing for a moment.")}
+${why('Agreeing first lowers their guard. They expect a fight and get a friend instead. Don\'t argue about their cabinet. Give them one new reason: the label. Handing them the bottle lets them prove it to themselves. Then stay quiet while they read.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Objection 2 of 4</span><h3>"I'm just looking."</h3>
+${say("Perfect. Have you ever smelled smoked garlic?")}
+${doit("Smelling is free and fun. Go right back into the opening.")}
+${why('"Just looking" is a habit, not a no. Most people say it at every booth. Don\'t push. A free smell asks nothing of them, so it is easy to say yes.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Objection 3 of 4</span><h3>"I'll come back later."</h3>
+${say("Sounds good. Which one was your favorite, so I know what to grab for you?")}
+${doit("If they name one, hand it to them.")}
+${why('Naming a favorite makes the choice real. Many people buy right then. If they don\'t, they still leave knowing what to come back for.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Objection 4 of 4</span><h3>"That's a little pricey."</h3>
+${say("I get it. You're paying for clean ingredients. All-natural, no MSG, and nothing you can't pronounce.")}
+${say("If you want to try it first, the small bottle is $11. Or the three-pack saves you money.","Then")}
+${why('Don\'t apologize or haggle. First remind them what they are paying for. Then offer a smaller step or a better deal. Either way, they stay in the conversation.')}</div></li>
+</ol>
+
+<h3 class="part">Closing</h3>
+<p class="note">Follow these 4 steps in order to close the sale.</p>
+<ol class="steps">
+<li><div><span class="eyebrow step-of">Step 1 of 4</span><h3>Ask the right question</h3>
+<div class="twocol">
+<div class="avoid"><span class="lbl">Never ask</span><span>"Do you want one?"</span></div>
+<div class="good"><span class="lbl">Ask</span><span>"Which ones were your favorites?"</span><span>"Which flavor fits your cooking best?"</span><span>"Let's build your three-pack."</span></div>
+</div>
+${why('"Do you want one?" asks for yes or no, and no is easy. "Which ones were your favorites?" assumes they liked something. It is easy to answer, and the answer is a bottle.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 2 of 4</span><h3>Make a pick for them</h3>
+<p>By now you have watched them smell every bottle. You should know which one they are leaning toward. Watch for the bottle they smelled twice, picked back up, or asked questions about.</p>
+${say("If you only get one, I'd go with <span class=\"fill\">their bottle</span>. That's the one you kept coming back to.")}
+${doit("Where you see <span class=\"fill\">their bottle</span>, say the name of the bottle THEY reacted to. Don't pick one just because it's your favorite or it fits everything.")}
+${why('When people can\'t decide, they want someone they trust to decide for them. A pick based on what they showed you feels like help, not a push. It also proves you were paying attention.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 3 of 4</span><h3>Build the three-pack</h3>
+${doit("Hand them their favorite.")}
+${say("What else do you cook? Want to make it a three-pack?")}
+${doit("Go back to Hole 4 and match two more.")}
+${why('The three-pack is a better deal for them and a bigger sale for us. Everybody wins.')}</div></li>
+
+<li><div><span class="eyebrow step-of">Step 4 of 4</span><h3>The last word</h3>
+${say("Try the dry brine tonight. Season it and leave it uncovered in the fridge.")}
+${why('The last thing they hear is how to use it. They cook it right, love it, and come back for more.')}</div></li>
+</ol>
+${quiz(6,Q[6])}`,
+
+7:()=>{
+  const pool=shuffle([...Q[1],...Q[2],...Q[3],...Q[4],...Q[5],...Q[6]]).slice(0,10);
+  return `<p>Ten mixed questions from every hole. Get all 10 right to pass. Each time you open this hole you get a new set.</p>
+  <p class="note">Before Hole 8, practice the full opening out loud with a coworker or a mirror at least three times.</p>
+  ${quiz(7,pool,{label:"Practice round"})}`;
+},
+
+8:()=>`
+<p>Your trainer watches you and checks each box in person. You can't check these yourself from reading. A level is complete when every box is checked.</p>
+<div class="fields">
+<label for="trainee">Trainee name<input type="text" id="trainee" value="${esc(S.trainee)}"></label>
+<label for="trainer">Trainer name<input type="text" id="trainer" value="${esc(S.trainer)}"></label>
+</div>
+${CERT.map(c=>{
+  const st=S.cert[c.lvl]||{};const all=c.items.every((_,i)=>st["i"+i]);
+  return `<div class="lvl${all?" done":""}" data-lvl="${c.lvl}"><span class="eyebrow">Level ${c.lvl}</span><h3>${c.name}</h3>
+  <span class="badge ${all?"on":"off"}">${all?"Certified":"In progress"}</span>
+  ${c.items.map((it,i)=>`<label class="chk" for="c${c.lvl}-${i}"><input type="checkbox" id="c${c.lvl}-${i}" data-l="${c.lvl}" data-i="${i}"${st["i"+i]?" checked":""}><span>${esc(it)}</span></label>`).join("")}
+  <div class="fields"><label for="d${c.lvl}">Date signed off<input type="date" id="d${c.lvl}" data-date="${c.lvl}" value="${esc(st.date||"")}"></label></div></div>`;
+}).join("")}
+<div id="certbox"></div>
+<p class="note">Progress saves in this browser only. Use the same device for the whole training.</p>`
+};
+
+function renderHole(){
+  const h=HOLES[S.cur-1];
+  $("#main").innerHTML=`<article class="hole"><div class="hole-head"><div class="tee"><div class="tee-hole"><span>Hole</span><b>${h.n}</b></div><div class="tee-par"><span>Par</span><b>${h.par}</b></div><span class="tee-of">${h.n} of 8</span></div><h2>${h.title}</h2></div>
+  ${BODY[h.n]()}
+  <div class="navrow">${h.n>1?`<button class="btn" type="button" data-go="${h.n-1}">← Hole ${h.n-1}</button>`:"<span></span>"}
+  <div class="reset-row">${h.n<8?`<button class="btn" type="button" id="mulligan-btn" title="Clear this hole's answers and score and try it again"><span class="b-main">Mulligan</span><span class="b-sub">Redo Hole ${h.n} only</span></button>`:""}<button class="btn" type="button" id="reset-btn"><span class="b-main">Start over</span><span class="b-sub">Whole course, Hole 1</span></button>
+    <div class="reset-confirm" id="reset-confirm" hidden><span>This clears every hole, your scorecard, names, and trainer sign-offs. Start the whole course over?</span>
+      <button class="btn small danger" type="button" id="reset-yes">Yes, start over</button>
+      <button class="btn small" type="button" id="reset-no">Cancel</button></div></div>
+  ${h.n<8?`<div class="next-wrap"><button class="btn primary" type="button" id="next-btn" data-go="${h.n+1}"${unlocked(h.n+1)?"":" disabled"}>Hole ${h.n+1} →</button><span class="note" id="next-hint"${unlocked(h.n+1)?" hidden":""}>Pass the quiz to unlock Hole ${h.n+1}.</span></div>`:"<span></span>"}</div></article>`;
+  if(h.n===8)wireCert();
+}
+function wireCert(){
+  ["trainee","trainer"].forEach(k=>$("#"+k).addEventListener("input",e=>{S[k]=e.target.value;save();renderCertificate();}));
+  document.querySelectorAll("[data-l]").forEach(cb=>cb.addEventListener("change",()=>{
+    const l=cb.dataset.l;S.cert[l]=S.cert[l]||{};S.cert[l]["i"+cb.dataset.i]=cb.checked;
+    const c=CERT[l-1];const all=c.items.every((_,i)=>S.cert[l]["i"+i]);
+    const box=cb.closest(".lvl");box.classList.toggle("done",all);
+    const b=box.querySelector(".badge");b.className="badge "+(all?"on":"off");b.textContent=all?"Certified":"In progress";
+    S.done[8]=CERT.every(x=>x.items.every((_,i)=>(S.cert[x.lvl]||{})["i"+i]));save();renderCard();renderCertificate();
+  }));
+  document.querySelectorAll("[data-date]").forEach(d=>d.addEventListener("change",()=>{const l=d.dataset.date;S.cert[l]=S.cert[l]||{};S.cert[l].date=d.value;save();renderCertificate();}));
+  renderCertificate();
+}
+
+/* ---------- certificate ---------- */
+function allCertified(){return CERT.every(x=>x.items.every((_,i)=>(S.cert[x.lvl]||{})["i"+i]));}
+function certDate(){
+  const ds=CERT.map(c=>(S.cert[c.lvl]||{}).date).filter(Boolean).sort();
+  const d=ds.length?new Date(ds[ds.length-1]+"T12:00:00"):new Date();
+  return d.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+}
+function renderCertificate(){
+  const box=$("#certbox");if(!box)return;
+  if(!allCertified()){
+    if(S.certId){delete S.certId;save();}
+    const n=CERT.filter(x=>x.items.every((_,i)=>(S.cert[x.lvl]||{})["i"+i])).length;
+    box.innerHTML=`<div class="cert-wait"><span class="eyebrow">Your certificate</span><p>Your Certified SmokED Stuff Dealer certificate appears here when all 4 levels are certified. <strong>${n} of 4 done.</strong></p></div>`;
+    return;
+  }
+  if(!S.certId){const r=Math.random().toString(36).slice(2,6).toUpperCase();const d=new Date();S.certId=`SS-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}-${r}`;save();}
+  const name=S.trainee.trim(),trainer=S.trainer.trim();
+  box.innerHTML=`<div class="cert-done"><span class="eyebrow">Course complete</span><h3>You're certified!</h3>
+  ${name&&trainer?"":`<p class="fb no">Add the ${!name?"trainee":"trainer"} name above so it shows on the certificate.</p>`}
+  <div class="cert" id="cert">
+    <div class="cert-in">
+      <span class="cert-brand">SmokED Stuff Sales Academy</span>
+      <span class="cert-title">Certified SmokED Stuff Dealer</span>
+      <span class="cert-small">This certifies that</span>
+      <span class="cert-name">${esc(name||"Trainee name")}</span>
+      <span class="cert-small">played all 8 holes and passed all 4 levels: Product Knowledge, Sales Process, Product Matching, and Independent Seller.</span>
+      <div class="cert-foot">
+        <div><b>${esc(trainer||"Trainer name")}</b><span>Trainer</span></div>
+        <div><b>${certDate()}</b><span>Date</span></div>
+        <div><b>${S.certId}</b><span>Certificate No.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="nb-btns"><button class="btn primary" type="button" id="cert-save">Save certificate</button></div>
+  <p class="note" id="cert-msg">Saves a picture of the certificate. Send it to your manager as proof.</p></div>`;
+  $("#cert-save").addEventListener("click",saveCertificate);
+}
+function drawCertificate(){
+  const W=1600,H=1100,cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  const ink="#2A231E",green="#2E6A44",gold="#C9951F",muted="#66655C";
+  g.fillStyle="#FFFFFF";g.fillRect(0,0,W,H);
+  g.strokeStyle=green;g.lineWidth=18;g.strokeRect(30,30,W-60,H-60);
+  g.strokeStyle=gold;g.lineWidth=4;g.strokeRect(64,64,W-128,H-128);
+  g.textAlign="center";g.fillStyle=muted;
+  g.font='500 30px "IBM Plex Mono", monospace';g.fillText("SMOKED STUFF SALES ACADEMY",W/2,190);
+  g.fillStyle=green;g.font='700 84px "Zilla Slab", Georgia, serif';g.fillText("Certified SmokED Stuff Dealer",W/2,315);
+  g.fillStyle=muted;g.font='400 34px "Atkinson Hyperlegible", sans-serif';g.fillText("This certifies that",W/2,420);
+  g.fillStyle=ink;g.font='700 84px "Zilla Slab", Georgia, serif';g.fillText(S.trainee.trim()||"Trainee name",W/2,530);
+  g.strokeStyle=gold;g.lineWidth=3;g.beginPath();g.moveTo(400,560);g.lineTo(1200,560);g.stroke();
+  g.fillStyle=ink;g.font='400 32px "Atkinson Hyperlegible", sans-serif';
+  g.fillText("played all 8 holes and passed all 4 levels:",W/2,630);
+  g.fillText("Product Knowledge, Sales Process, Product Matching, and Independent Seller.",W/2,678);
+  const cols=[[S.trainer.trim()||"Trainer name","TRAINER"],[certDate(),"DATE"],[S.certId,"CERTIFICATE NO."]];
+  cols.forEach((c,i)=>{const x=W/2+(i-1)*440;
+    g.fillStyle=ink;g.font='700 36px "Atkinson Hyperlegible", sans-serif';g.fillText(c[0],x,860);
+    g.strokeStyle=ink;g.lineWidth=2;g.beginPath();g.moveTo(x-180,885);g.lineTo(x+180,885);g.stroke();
+    g.fillStyle=muted;g.font='500 22px "IBM Plex Mono", monospace';g.fillText(c[1],x,920);});
+  return new Promise(r=>cv.toBlob(r,"image/png"));
+}
+async function saveCertificate(){
+  const msg=$("#cert-msg");
+  try{await document.fonts.ready;}catch(e){}
+  const blob=await drawCertificate();
+  const filename=`SmokED-Stuff-Certificate-${(S.trainee.trim()||"Trainee").replace(/[^A-Za-z0-9]+/g,"-")}.png`;
+  let dl=null;try{dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;}catch(e){}
+  if(dl){
+    try{await dl.save({filename,data:blob});msg.textContent="Saved. Send it to your manager as proof.";}
+    catch(err){msg.textContent=err&&err.code==="declined"?"Not saved. Click Save certificate to try again.":"This view can't save files. Take a screenshot of the certificate instead.";}
+    return;
+  }
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();msg.textContent="Saved to your Downloads folder.";}
+  catch(e){msg.textContent="Saving didn't work here. Take a screenshot of the certificate instead.";}
+}
+
+document.addEventListener("click",e=>{
+  const bt=e.target.closest("button");const id=bt?bt.id:"";
+  if(id==="mulligan-btn"){delete S.scores[S.cur];delete S.done[S.cur];save();renderCard();renderHole();window.scrollTo({top:0,behavior:"smooth"});}
+  else if(id==="reset-btn"){$("#reset-confirm").hidden=false;$("#reset-btn").hidden=true;}
+  else if(id==="reset-no"){$("#reset-confirm").hidden=true;$("#reset-btn").hidden=false;}
+  else if(id==="reset-yes"){S={cur:1,done:{},cert:{},scores:{},trainee:"",trainer:""};try{localStorage.removeItem(KEY);}catch(e){}go(1);}
+});
+if(!unlocked(S.cur))S.cur=1;
+renderCard();renderHole();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
