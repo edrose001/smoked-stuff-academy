@@ -184,6 +184,8 @@ table.route td:first-child{font-weight:700;white-space:nowrap}
 @media (max-width:560px){.nb-row{grid-template-columns:1fr}}
 #mulligan-btn,#reset-btn{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.2;text-align:center}
 .b-sub{font-size:12px;font-weight:400;color:var(--muted)}
+.jump{display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.jump select{font:inherit;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:4px;padding:8px 10px;max-width:100%}
 .reset-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
 .reset-confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-soft);border:1px solid var(--bad);border-radius:4px;padding:8px 12px}
 .btn.small{padding:6px 12px;font-size:15px}
@@ -742,7 +744,7 @@ function renderHole(){
   $("#main").innerHTML=`<article class="hole"><div class="hole-head"><div class="tee"><div class="tee-hole"><span>Hole</span><b>${h.n}</b></div><div class="tee-par"><span>Par</span><b>${h.par}</b></div><span class="tee-of">${h.n} of 8</span></div><h2>${h.title}</h2></div>
   ${BODY[h.n]()}
   <div class="navrow">${h.n>1?`<button class="btn" type="button" data-go="${h.n-1}">← Hole ${h.n-1}</button>`:"<span></span>"}
-  <div class="reset-row">${h.n<8?`<button class="btn" type="button" id="mulligan-btn" title="Clear this hole's answers and score and try it again"><span class="b-main">Mulligan</span><span class="b-sub">Redo Hole ${h.n} only</span></button>`:""}<button class="btn" type="button" id="reset-btn"><span class="b-main">Start over</span><span class="b-sub">Whole course, Hole 1</span></button>
+  <div class="reset-row"><label class="jump" for="jump-sel"><span class="b-sub">Review a hole</span><select id="jump-sel">${HOLES.map(x=>`<option value="${x.n}"${x.n===h.n?" selected":""}${unlocked(x.n)?"":" disabled"}>Hole ${x.n}: ${x.title}${unlocked(x.n)?"":" (locked)"}</option>`).join("")}</select></label>${h.n<8?`<button class="btn" type="button" id="mulligan-btn" title="Clear this hole's answers and score and try it again"><span class="b-main">Mulligan</span><span class="b-sub">Redo Hole ${h.n} only</span></button>`:""}<button class="btn" type="button" id="reset-btn"><span class="b-main">Start over</span><span class="b-sub">Whole course, Hole 1</span></button>
     <div class="reset-confirm" id="reset-confirm" hidden><span>This clears every hole, your scorecard, names, and trainer sign-offs. Start the whole course over?</span>
       <button class="btn small danger" type="button" id="reset-yes">Yes, start over</button>
       <button class="btn small" type="button" id="reset-no">Cancel</button></div></div>
@@ -836,6 +838,7 @@ async function saveCertificate(){
   catch(e){msg.textContent="Saving didn't work here. Take a screenshot of the certificate instead.";}
 }
 
+document.addEventListener("change",e=>{if(e.target.id==="jump-sel")go(+e.target.value);});
 document.addEventListener("click",e=>{
   const bt=e.target.closest("button");const id=bt?bt.id:"";
   if(id==="mulligan-btn"){delete S.scores[S.cur];delete S.done[S.cur];save();renderCard();renderHole();window.scrollTo({top:0,behavior:"smooth"});}
