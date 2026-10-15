@@ -753,7 +753,7 @@ function renderHole(){
     <div class="reset-confirm" id="reset-confirm" hidden><span>This clears every hole, your scorecard, names, and trainer sign-offs. Start the whole course over?</span>
       <button class="btn small danger" type="button" id="reset-yes">Yes, start over</button>
       <button class="btn small" type="button" id="reset-no">Cancel</button></div></div>
-  ${h.n<8?`<div class="next-wrap"><button class="btn primary" type="button" id="next-btn" data-go="${h.n+1}"${(!unlocked(h.n)||unlocked(h.n+1))?"":" disabled"}>Hole ${h.n+1} →</button><span class="note" id="next-hint"${(!unlocked(h.n)||unlocked(h.n+1))?" hidden":""}>Pass the quiz to unlock Hole ${h.n+1}.</span></div>`:"<span></span>"}</div></article>`;
+  ${h.n<8?`<div class="next-wrap"><button class="btn primary" type="button" id="next-btn" data-go="${h.n+1}">Hole ${h.n+1} →</button><span class="note" id="next-hint"${(!unlocked(h.n)||unlocked(h.n+1))?" hidden":""}>You can read ahead. Hole ${h.n+1}'s quiz unlocks after you pass this one.</span></div>`:"<span></span>"}</div></article>`;
   if(h.n===8)wireCert();
 }
 function wireCert(){
