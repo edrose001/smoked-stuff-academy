@@ -160,8 +160,10 @@ table.route td:first-child{font-weight:700;white-space:nowrap}
 .btn.wrong{background:var(--bad-soft);border-color:var(--bad)}
 .btn:disabled{cursor:default}
 .btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.ahead-banner{background:var(--flag-soft);border:1px solid var(--flag);border-radius:4px;padding:12px 16px}
+.panel.ahead{border-style:dashed}
 .next-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.scorecard .locked button{opacity:.35;cursor:not-allowed}
+.scorecard .locked button{opacity:.5}
 .q{display:flex;flex-direction:column;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .q:last-of-type{border-bottom:0}
 .q legend{font-weight:700;padding:0;margin-bottom:6px}
@@ -350,7 +352,7 @@ function renderCard(){
   h.innerHTML="<th>Hole</th>";n.innerHTML="<td>Lesson</td>";d.innerHTML="<td>Done</td>";sc.innerHTML="<td>Quiz</td>";pr.innerHTML="<td>Par</td>";
   HOLES.forEach(x=>{
     const c=x.n===S.cur?' class="cur"':"";
-    const lk=unlocked(x.n)?"":" disabled";const cl=(x.n===S.cur?"cur":"")+(lk?" locked":"");const c2=cl?` class="${cl.trim()}"`:"";
+    const lk="";const cl=(x.n===S.cur?"cur":"")+(unlocked(x.n)?"":" locked");const c2=cl?` class="${cl.trim()}"`:"";
     h.insertAdjacentHTML("beforeend",`<th${c2}><button data-go="${x.n}"${lk} aria-label="Go to hole ${x.n}, ${x.title}">${x.n}</button></th>`);
     n.insertAdjacentHTML("beforeend",`<td${c2}><button data-go="${x.n}" tabindex="-1"${lk}>${x.short}</button></td>`);
     let v="–";
@@ -370,10 +372,12 @@ function renderCard(){
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b){go(+b.dataset.go);}});
 function unlocked(n){for(let k=1;k<n&&k<8;k++){if(!S.done[k])return false;}return true;}
-function go(n){if(!unlocked(n))return;S.cur=n;save();renderCard();renderHole();window.scrollTo({top:0,behavior:"smooth"});}
+function frontier(){for(let k=1;k<8;k++){if(!S.done[k])return k;}return 8;}
+function go(n){S.cur=n;save();renderCard();renderHole();window.scrollTo({top:0,behavior:"smooth"});}
 
 /* ---------- quiz ---------- */
 function quiz(holeN,list,{pass,label="Hole quiz"}={}){
+  if(!unlocked(holeN))return `<div class="panel ahead"><h3>${label}<span class="score">Locked</span></h3><p>This quiz unlocks after you pass Hole ${frontier()}. Read ahead all you like.</p><button class="btn" type="button" data-go="${frontier()}">Go to Hole ${frontier()}</button></div>`;
   const id="qz"+holeN;
   const items=list.map((it,i)=>({...it,opts:shuffle([it.a,...it.w]),i}));
   pass=pass??items.length;
@@ -742,16 +746,18 @@ ${CERT.map(c=>{
 function renderHole(){
   const h=HOLES[S.cur-1];
   $("#main").innerHTML=`<article class="hole"><div class="hole-head"><div class="tee"><div class="tee-hole"><span>Hole</span><b>${h.n}</b></div><div class="tee-par"><span>Par</span><b>${h.par}</b></div><span class="tee-of">${h.n} of 8</span></div><h2>${h.title}</h2></div>
+  ${unlocked(h.n)?"":`<div class="ahead-banner"><strong>You're reading ahead.</strong> Look around and learn. The quiz on this hole unlocks after you pass Hole ${frontier()}.</div>`}
   ${BODY[h.n]()}
   <div class="navrow">${h.n>1?`<button class="btn" type="button" data-go="${h.n-1}">← Hole ${h.n-1}</button>`:"<span></span>"}
-  <div class="reset-row"><label class="jump" for="jump-sel"><span class="b-sub">Review a hole</span><select id="jump-sel">${HOLES.map(x=>`<option value="${x.n}"${x.n===h.n?" selected":""}${unlocked(x.n)?"":" disabled"}>Hole ${x.n}: ${x.title}${unlocked(x.n)?"":" (locked)"}</option>`).join("")}</select></label>${h.n<8?`<button class="btn" type="button" id="mulligan-btn" title="Clear this hole's answers and score and try it again"><span class="b-main">Mulligan</span><span class="b-sub">Redo Hole ${h.n} only</span></button>`:""}<button class="btn" type="button" id="reset-btn"><span class="b-main">Start over</span><span class="b-sub">Whole course, Hole 1</span></button>
+  <div class="reset-row"><label class="jump" for="jump-sel"><span class="b-sub">Review a hole</span><select id="jump-sel">${HOLES.map(x=>`<option value="${x.n}"${x.n===h.n?" selected":""}>Hole ${x.n}: ${x.title}${unlocked(x.n)?"":" (read ahead)"}</option>`).join("")}</select></label>${h.n<8?`<button class="btn" type="button" id="mulligan-btn" title="Clear this hole's answers and score and try it again"><span class="b-main">Mulligan</span><span class="b-sub">Redo Hole ${h.n} only</span></button>`:""}<button class="btn" type="button" id="reset-btn"><span class="b-main">Start over</span><span class="b-sub">Whole course, Hole 1</span></button>
     <div class="reset-confirm" id="reset-confirm" hidden><span>This clears every hole, your scorecard, names, and trainer sign-offs. Start the whole course over?</span>
       <button class="btn small danger" type="button" id="reset-yes">Yes, start over</button>
       <button class="btn small" type="button" id="reset-no">Cancel</button></div></div>
-  ${h.n<8?`<div class="next-wrap"><button class="btn primary" type="button" id="next-btn" data-go="${h.n+1}"${unlocked(h.n+1)?"":" disabled"}>Hole ${h.n+1} →</button><span class="note" id="next-hint"${unlocked(h.n+1)?" hidden":""}>Pass the quiz to unlock Hole ${h.n+1}.</span></div>`:"<span></span>"}</div></article>`;
+  ${h.n<8?`<div class="next-wrap"><button class="btn primary" type="button" id="next-btn" data-go="${h.n+1}"${(!unlocked(h.n)||unlocked(h.n+1))?"":" disabled"}>Hole ${h.n+1} →</button><span class="note" id="next-hint"${(!unlocked(h.n)||unlocked(h.n+1))?" hidden":""}>Pass the quiz to unlock Hole ${h.n+1}.</span></div>`:"<span></span>"}</div></article>`;
   if(h.n===8)wireCert();
 }
 function wireCert(){
+  if(!unlocked(8))document.querySelectorAll("#main .lvl input,#trainee,#trainer").forEach(el=>el.disabled=true);
   ["trainee","trainer"].forEach(k=>$("#"+k).addEventListener("input",e=>{S[k]=e.target.value;save();renderCertificate();}));
   document.querySelectorAll("[data-l]").forEach(cb=>cb.addEventListener("change",()=>{
     const l=cb.dataset.l;S.cert[l]=S.cert[l]||{};S.cert[l]["i"+cb.dataset.i]=cb.checked;
@@ -846,7 +852,6 @@ document.addEventListener("click",e=>{
   else if(id==="reset-no"){$("#reset-confirm").hidden=true;$("#reset-btn").hidden=false;}
   else if(id==="reset-yes"){S={cur:1,done:{},cert:{},scores:{},trainee:"",trainer:""};try{localStorage.removeItem(KEY);}catch(e){}go(1);}
 });
-if(!unlocked(S.cur))S.cur=1;
 renderCard();renderHole();
 </script>
 
