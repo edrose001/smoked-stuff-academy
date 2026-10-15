@@ -1,5 +1,5 @@
 // Offline support. CACHE changes on every build so phones pick up updates.
-const CACHE = "ssa-20261014214958";
+const CACHE = "ssa-20261014215426";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
