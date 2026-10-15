@@ -322,8 +322,9 @@ const Q = {
     {q:"A military customer buys 3 large. What do you tap in Square?", a:"Military", w:["Nothing. Square adds the bundle","3 large for $43 + Military"], why:"Square adds the 3-pack on its own. Military goes on top of bundles."},
     {q:"When do you ask about discounts?", a:"At checkout, before you ring them up", w:["As soon as they walk up","Only if they ask"], why:"Keep the talk about flavor. The discount is a nice surprise at the end."},
     {q:"Can a customer mix sizes in a 3-pack?", a:"Only if we're out of a size and swap one in", w:["Yes, any mix","Never, even if we're out of a size"], why:"Bundles are one size. We only mix to keep a customer happy when we're out."},
-    {q:"When can you use the Manual Discount?", a:"A damaged bottle, our mistake, or a long wait", w:["Any time a customer asks","When a customer says the price is too high"], why:"It is a make-good when something goes wrong, not a bargaining tool."},
-    {q:"How much is the Manual Discount?", a:"$11 off, the same as a free small bottle", w:["10% off","$5 off"], why:"$11 off, and it goes on top of any other discount."}
+    {q:"When can you use the Manual Discount?", a:"A damaged bottle, our mistake, a long wait, or an unsealed display bottle when we're out of stock", w:["Any time a customer asks","When a customer says the price is too high"], why:"It is a make-good when something goes wrong, not a bargaining tool."},
+    {q:"How much is the Manual Discount for a damaged bottle, our mistake, or a long wait?", a:"$11 off, the same as a free small bottle", w:["10% off","$5 off"], why:"$11 off, and it goes on top of any other discount."},
+    {q:"We're out of stock and a customer takes the unsealed display bottle. What do you do?", a:"Manual Discount, 50% off that bottle", w:["Manual Discount, $11 off","Sell it at full price"], why:"Display bottles are half off, and only when we're out of stock."}
   ]
 };
 
@@ -518,7 +519,8 @@ const DEAL_CASES=[
   {who:"Firefighter buying 2 small",deal:"First responder",hint:"Which group do firefighters belong to?"},
   {who:"First-time customer, not military, a first responder, or a vendor, buying 3 small",deal:"Nothing. Square adds the bundle",hint:"No customer discount fits. Does Square still give them something on its own?"},
   {who:"Military customer buying 1 large, and the bottle is dented",deal:"Military + Manual Discount",hint:"They get their customer discount. Is there also a make-good for a damaged bottle?"},
-  {who:"First-time customer buying 1 large who waited a long time to be helped",deal:"Manual Discount",hint:"No customer discount fits. Is there a make-good for a long wait?"}
+  {who:"First-time customer buying 1 large who waited a long time to be helped",deal:"Manual Discount",hint:"No customer discount fits. Is there a make-good for a long wait?"},
+  {who:"Repeat customer who wants Birdie, but we're out. They'll take the open display bottle",deal:"Repeat customer + Manual Discount",hint:"They get their customer discount. Is there also a markdown for an unsealed display bottle?"}
 ];
 function dealGame(){
   setTimeout(()=>{
@@ -546,7 +548,7 @@ function dealGame(){
     root.querySelector(".again").addEventListener("click",deal);
     deal();
   });
-  return `<div class="panel" id="dgame"><h3>Pick the deal<span class="score">10 customers</span></h3>
+  return `<div class="panel" id="dgame"><h3>Pick the deal<span class="score">11 customers</span></h3>
   <p class="note">Each customer is ready to check out. Pick what you would tap in Square, named just like it is in Square. Square adds the 3-pack and Buy 5, Get 1 Free on its own. No math needed. Miss one and you get a hint, not the answer.</p>
   <ol class="nb-list"></ol>
   <div class="nb-btns"><button class="btn primary check" type="button">Check my answers</button><button class="btn again" type="button">Shuffle and try again</button></div>
@@ -817,10 +819,12 @@ ${why('Asking at checkout keeps the conversation about flavor. The discount beco
 
 <section class="block"><h3>Manual Discount</h3>
 <p>Use it only when something goes wrong:</p>
-<ul class="plain"><li>A damaged bottle</li><li>Our mistake</li><li>A long wait</li></ul>
-<div class="rule"><span class="lbl">Amount</span><strong>$11 off, the same as a free small bottle.</strong><span>It goes on top of any other discount.</span></div>
+<ul class="plain"><li>A damaged bottle</li><li>Our mistake</li><li>A long wait</li><li>Selling an unsealed display bottle, only when we're out of stock</li></ul>
+<div class="rule"><span class="lbl">Amount</span><strong>$11 off, the same as a free small bottle.</strong><span>For an unsealed display bottle: 50% off that bottle. Either way, it goes on top of any other discount.</span></div>
 ${say("I'm sorry about that. Let me make it right.")}
 ${doit("Tap Manual Discount in Square and enter $11.")}
+${say("We're out of that one, but you can have the display bottle for half off.","Out of stock")}
+${doit("Tap Manual Discount on the display bottle and enter 50%.")}
 ${why('Fixing a problem quickly and generously turns an upset customer into a loyal one. A small make-good costs far less than losing a customer.')}</section>
 
 <section class="block"><h3>Examples</h3>
@@ -831,7 +835,8 @@ ${why('Fixing a problem quickly and generously turns an upset customer into a lo
 <tr><td>Vendor, 3 large</td><td>Nothing. Square adds the bundle</td></tr>
 <tr><td>Teacher, 3 large</td><td>First responder</td></tr>
 <tr><td>Military and repeat customer, 6 small</td><td>Military</td></tr>
-<tr><td>Military, bottle is dented</td><td>Military + Manual Discount</td></tr>
+<tr><td>Military, bottle is dented</td><td>Military + Manual Discount ($11)</td></tr>
+<tr><td>Out of stock, customer takes the display bottle</td><td>Manual Discount (50% off that bottle)</td></tr>
 </tbody></table></div></section>
 ${dealGame()}
 ${quiz(7,Q[7])}`,
