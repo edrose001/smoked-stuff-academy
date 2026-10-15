@@ -437,6 +437,49 @@ function blendGame(){
   <p class="result" hidden></p></div>`;
 }
 
+/* ---------- name that wood game ---------- */
+const SMOKED=[
+  {name:"Garlic",wood:"Hickory"},
+  {name:"Sea Salt",wood:"Bourbon Barrel"},
+  {name:"Black Pepper",wood:"Bourbon Barrel"},
+  {name:"Paprika",wood:"Oak"},
+  {name:"Onion",wood:"Hickory"},
+  {name:"Brown Sugar",wood:"Bourbon Barrel"}
+];
+const WOODS=["Hickory","Bourbon Barrel","Oak"];
+function woodGame(){
+  setTimeout(()=>{
+    const root=$("#wgame");if(!root)return;
+    const list=root.querySelector(".nb-list"),res=root.querySelector(".result");
+    let order=[];
+    function deal(){
+      order=shuffle(SMOKED);res.hidden=true;root.querySelector(".score").textContent="6 spices";
+      const opts=`<option value="">Pick a wood</option>`+WOODS.map(w=>`<option>${w}</option>`).join("");
+      list.innerHTML=order.map((p,i)=>`<li class="nb-row"><label for="wg-${i}" class="clue">Smoked ${p.name}</label>
+        <select id="wg-${i}">${opts}</select><div class="fb" hidden></div></li>`).join("");
+    }
+    root.querySelector(".check").addEventListener("click",()=>{
+      let right=0;
+      order.forEach((p,i)=>{
+        const sel=document.getElementById("wg-"+i),fb=sel.parentElement.querySelector(".fb");
+        fb.hidden=false;const ok=sel.value===p.wood;if(ok)right++;
+        sel.classList.toggle("right",ok);sel.classList.toggle("wrong",!ok);
+        fb.className="fb "+(ok?"ok":"no");
+        fb.textContent=(ok?"Yes. ":"Not quite. ")+`It's ${p.wood} Smoked ${p.name}.`;
+      });
+      root.querySelector(".score").textContent=`${right} of 6`;
+      res.hidden=false;res.textContent=right===6?"6 of 6. You know your smoke!":`${right} of 6. Shuffle and go again until you get all 6.`;
+    });
+    root.querySelector(".again").addEventListener("click",deal);
+    deal();
+  });
+  return `<div class="panel" id="wgame"><h3>Name that wood<span class="score">6 spices</span></h3>
+  <p class="note">All six smoked spices, in a random order. Pick the wood each one is smoked over. Then check your answers.</p>
+  <ol class="nb-list"></ol>
+  <div class="nb-btns"><button class="btn primary check" type="button">Check my answers</button><button class="btn again" type="button">Shuffle and try again</button></div>
+  <p class="result" hidden></p></div>`;
+}
+
 /* ---------- holes ---------- */
 const BODY = {
 1:()=>`
@@ -510,6 +553,7 @@ ${quiz(2,Q[2])}`,
 <section class="block"><h3>The six smoked products</h3>
 <div class="found"><span>Hickory Smoked Garlic</span><span>Bourbon Barrel Smoked Sea Salt</span><span>Bourbon Barrel Smoked Black Pepper</span><span>Oak Smoked Paprika</span><span>Hickory Smoked Onion</span><span>Bourbon Barrel Smoked Brown Sugar</span></div>
 ${why('Knowing the base helps you explain every blend. When a customer asks "What makes this different?" you can point back to the smoke.')}</section>
+${woodGame()}
 <section class="block"><h3>The nine blends</h3>
 <p class="note">Every blend is named after golf. Each one has one clear job.</p>
 <div class="prods">${PRODUCTS.map(p=>`<div class="prod"><span class="id">${p.id}</span><h3>${p.name}</h3>
