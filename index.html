@@ -318,8 +318,8 @@ const Q = {
     {q:"How much is the military discount?", a:"15% off", w:["10% off","20% off"], why:"Military is 15%. First responder, vendor, and repeat customer are 10%."},
     {q:"Who gets the first responder discount?", a:"Police, fire, EMS, and teachers", w:["Police and fire only","Anyone with a city job"], why:"Teachers count as first responders too."},
     {q:"A teacher is also a repeat customer. What do they get?", a:"10% off. Only one percent discount per sale", w:["20% off","No discount"], why:"One percent discount per sale. If more than one fits, use the biggest."},
-    {q:"A vendor buys 3 large. Which deal do you pick?", a:"3-pack price only", w:["3-pack price plus 10% off","10% off three single bottles"], why:"The vendor 10% only goes on 1 or 2 bottles."},
-    {q:"A military customer buys 3 large. Which deal do you pick?", a:"3-pack price plus 15% off", w:["3-pack price only","15% off three single bottles"], why:"Military, first responder, and repeat customer discounts go on bundles too."},
+    {q:"A vendor buys 3 large. What do you tap in Square?", a:"3 large for $43", w:["3 large for $43 + Vendor","Vendor"], why:"The vendor 10% only goes on 1 or 2 bottles."},
+    {q:"A military customer buys 3 large. What do you tap in Square?", a:"3 large for $43 + Military", w:["3 large for $43","Military"], why:"Military, first responder, and repeat customer discounts go on bundles too."},
     {q:"When do you ask about discounts?", a:"At checkout, before you ring them up", w:["As soon as they walk up","Only if they ask"], why:"Keep the talk about flavor. The discount is a nice surprise at the end."},
     {q:"Can a customer mix sizes in a 3-pack?", a:"Only if we're out of a size and swap one in", w:["Yes, any mix","Never, even if we're out of a size"], why:"Bundles are one size. We only mix to keep a customer happy when we're out."}
   ]
@@ -505,16 +505,16 @@ function woodGame(){
 }
 
 /* ---------- pick the deal game ---------- */
-const DEALS=["10% off","15% off","3-pack price only","3-pack price plus 10% off","3-pack price plus 15% off","Buy 5, Get 1 Free only","Buy 5, Get 1 Free plus 10% off","Buy 5, Get 1 Free plus 15% off","No discount"];
+const DEALS=["Military","First responder","Repeat customer","Vendor","3 small for $30","3 large for $43","3 large for $43 + Military","3 large for $43 + First responder","3 large for $43 + Repeat customer","3 large for $43 + Vendor","Buy 5, Get 1 Free (small)","Buy 5, Get 1 Free (small) + Military","Buy 5, Get 1 Free (small) + Repeat customer","No discount"];
 const DEAL_CASES=[
-  {who:"Repeat customer buying 2 large",deal:"10% off",hint:"Two bottles is not a bundle. Does a repeat customer get a percent off?"},
-  {who:"Repeat customer buying 3 large",deal:"3-pack price plus 10% off",hint:"3 of one size is always a 3-pack. Can a repeat customer's discount go on a bundle?"},
-  {who:"Vendor buying 3 large",deal:"3-pack price only",hint:"3 of one size is always a 3-pack. How many bottles can the vendor discount go on?"},
-  {who:"Vendor buying 1 small",deal:"10% off",hint:"The vendor discount works on small orders. How much is it?"},
-  {who:"Teacher buying 3 large",deal:"3-pack price plus 10% off",hint:"Which group do teachers belong to? Can that discount go on a bundle?"},
-  {who:"Military veteran who is also a repeat customer, buying 6 small",deal:"Buy 5, Get 1 Free plus 15% off",hint:"Six of one size earns a free bottle. With two discounts, which one wins?"},
-  {who:"Firefighter buying 2 small",deal:"10% off",hint:"Firefighters are first responders. How much is that discount?"},
-  {who:"First-time customer, not military, a first responder, or a vendor, buying 3 small",deal:"3-pack price only",hint:"No percent discount fits this customer. Is there still a bundle?"}
+  {who:"Repeat customer buying 2 large",deal:"Repeat customer",hint:"Two bottles is not a bundle. Does a repeat customer get a percent off?"},
+  {who:"Repeat customer buying 3 large",deal:"3 large for $43 + Repeat customer",hint:"3 of one size is always a 3-pack. Can a repeat customer's discount go on a bundle?"},
+  {who:"Vendor buying 3 large",deal:"3 large for $43",hint:"3 of one size is always a 3-pack. How many bottles can the vendor discount go on?"},
+  {who:"Vendor buying 1 small",deal:"Vendor",hint:"One bottle is not a bundle. Is there a discount for people working another booth?"},
+  {who:"Teacher buying 3 large",deal:"3 large for $43 + First responder",hint:"Which group do teachers belong to? Can that discount go on a bundle?"},
+  {who:"Military veteran who is also a repeat customer, buying 6 small",deal:"Buy 5, Get 1 Free (small) + Military",hint:"Six of one size earns a free bottle. With two discounts, which one wins?"},
+  {who:"Firefighter buying 2 small",deal:"First responder",hint:"Two bottles is not a bundle. Which group do firefighters belong to?"},
+  {who:"First-time customer, not military, a first responder, or a vendor, buying 3 small",deal:"3 small for $30",hint:"No percent discount fits this customer. Is there still a bundle?"}
 ];
 function dealGame(){
   setTimeout(()=>{
@@ -523,7 +523,7 @@ function dealGame(){
     let order=[];
     function deal(){
       order=shuffle(DEAL_CASES);res.hidden=true;root.querySelector(".score").textContent=`${order.length} customers`;
-      const opts=`<option value="">Pick a deal</option>`+DEALS.map(d=>`<option>${d}</option>`).join("");
+      const opts=`<option value="">Pick from Square</option>`+DEALS.map(d=>`<option>${d}</option>`).join("");
       list.innerHTML=order.map((c,i)=>`<li class="nb-row"><label for="dg-${i}" class="clue">${c.who}</label>
         <select id="dg-${i}">${opts}</select><div class="fb" hidden></div></li>`).join("");
     }
@@ -543,7 +543,7 @@ function dealGame(){
     deal();
   });
   return `<div class="panel" id="dgame"><h3>Pick the deal<span class="score">8 customers</span></h3>
-  <p class="note">Each customer is ready to check out. Pick the deal you would choose in Square. No math needed. Miss one and you get a hint, not the answer.</p>
+  <p class="note">Each customer is ready to check out. Pick the discounts you would tap in Square, named just like they are in Square. No math needed. Miss one and you get a hint, not the answer.</p>
   <ol class="nb-list"></ol>
   <div class="nb-btns"><button class="btn primary check" type="button">Check my answers</button><button class="btn again" type="button">Shuffle and try again</button></div>
   <p class="result" hidden></p></div>`;
@@ -812,12 +812,12 @@ ${why('Asking at checkout keeps the conversation about flavor. The discount beco
 
 <section class="block"><h3>Examples</h3>
 <div class="tablebox"><table class="route">
-<thead><tr><th>Customer</th><th>Pick this deal</th></tr></thead><tbody>
-<tr><td>Repeat customer, 2 large</td><td>10% off</td></tr>
-<tr><td>Repeat customer, 3 large</td><td>3-pack price plus 10% off</td></tr>
-<tr><td>Vendor, 3 large</td><td>3-pack price only</td></tr>
-<tr><td>Teacher, 3 large</td><td>3-pack price plus 10% off</td></tr>
-<tr><td>Military and repeat customer, 6 small</td><td>Buy 5, Get 1 Free plus 15% off</td></tr>
+<thead><tr><th>Customer</th><th>Tap this in Square</th></tr></thead><tbody>
+<tr><td>Repeat customer, 2 large</td><td>Repeat customer</td></tr>
+<tr><td>Repeat customer, 3 large</td><td>3 large for $43 + Repeat customer</td></tr>
+<tr><td>Vendor, 3 large</td><td>3 large for $43</td></tr>
+<tr><td>Teacher, 3 large</td><td>3 large for $43 + First responder</td></tr>
+<tr><td>Military and repeat customer, 6 small</td><td>Buy 5, Get 1 Free (small) + Military</td></tr>
 </tbody></table></div></section>
 ${dealGame()}
 ${quiz(7,Q[7])}`,
