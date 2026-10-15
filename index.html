@@ -448,12 +448,12 @@ function blendGame(){
 
 /* ---------- name that wood game ---------- */
 const SMOKED=[
-  {name:"Garlic",wood:"Hickory"},
-  {name:"Sea Salt",wood:"Bourbon Barrel"},
-  {name:"Black Pepper",wood:"Bourbon Barrel"},
-  {name:"Paprika",wood:"Oak"},
-  {name:"Onion",wood:"Hickory"},
-  {name:"Brown Sugar",wood:"Bourbon Barrel"}
+  {name:"Garlic",wood:"Hickory",hint:"Garlic is bold. It needs a bold, strong smoke that can stand up to it."},
+  {name:"Sea Salt",wood:"Bourbon Barrel",hint:"You say this one's full name in the opening script. Think back to Step 2."},
+  {name:"Black Pepper",wood:"Bourbon Barrel",hint:"Pepper has a sharp bite. A sweeter smoke rounds it off."},
+  {name:"Paprika",wood:"Oak",hint:"Paprika is mild. It gets a medium, balanced smoke that no other spice uses."},
+  {name:"Onion",wood:"Hickory",hint:"Onion is bold, just like garlic. Think of the same strong smoke."},
+  {name:"Brown Sugar",wood:"Bourbon Barrel",hint:"Brown sugar is sweet. Match it with our sweetest smoke."}
 ];
 const WOODS=["Hickory","Bourbon Barrel","Oak"];
 function woodGame(){
@@ -474,16 +474,17 @@ function woodGame(){
         fb.hidden=false;const ok=sel.value===p.wood;if(ok)right++;
         sel.classList.toggle("right",ok);sel.classList.toggle("wrong",!ok);
         fb.className="fb "+(ok?"ok":"no");
-        fb.textContent=(ok?"Yes. ":"Not quite. ")+`It's ${p.wood} Smoked ${p.name}.`;
+        fb.textContent=ok?`Yes. It's ${p.wood} Smoked ${p.name}.`:(sel.value?"Not quite. Hint: ":"Pick a wood. Hint: ")+p.hint;
       });
       root.querySelector(".score").textContent=`${right} of 6`;
-      res.hidden=false;res.textContent=right===6?"6 of 6. You know your smoke!":`${right} of 6. Shuffle and go again until you get all 6.`;
+      res.hidden=false;res.textContent=right===6?"6 of 6. You know your smoke!":`${right} of 6. Read the hints, change your answers, and check again.`;
     });
     root.querySelector(".again").addEventListener("click",deal);
     deal();
   });
   return `<div class="panel" id="wgame"><h3>Name that wood<span class="score">6 spices</span></h3>
-  <p class="note">All six smoked spices, in a random order. Pick the wood each one is smoked over. Then check your answers.</p>
+  <p class="note">All six smoked spices, in a random order. Pick the wood each one is smoked over. Then check your answers. Miss one and you get a hint, not the answer.</p>
+  <div class="found"><span><strong>Hickory:</strong> bold and strong</span><span><strong>Bourbon Barrel:</strong> sweet</span><span><strong>Oak:</strong> medium and balanced</span></div>
   <ol class="nb-list"></ol>
   <div class="nb-btns"><button class="btn primary check" type="button">Check my answers</button><button class="btn again" type="button">Shuffle and try again</button></div>
   <p class="result" hidden></p></div>`;
